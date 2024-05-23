@@ -17,5 +17,4 @@ services:
           action: sync
 volumes:
   app:
-    driver: local
     external: true
