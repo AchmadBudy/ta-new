@@ -1,0 +1,14 @@
+services:
+  foo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    develop:
+      watch:
+        - path: requirements.txt
+          action: rebuild
+        - path: .
+          target: /app
+          action: sync
