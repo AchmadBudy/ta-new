@@ -2,3 +2,4 @@ scikit-learn
 ahpy
 pandas
 xgboost
+streamlit

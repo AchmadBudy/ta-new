@@ -5,6 +5,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/app
+    ports:
+      - 8501:8501
+    restart: always
     develop:
       watch:
         - path: requirements.txt
@@ -12,3 +15,6 @@ services:
         - path: .
           target: /app
           action: sync
+volumes:
+  app:
+    driver: local

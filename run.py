@@ -164,3 +164,28 @@ saw_df['Prediction'] = stacking_model.predict(data)
 print(saw_df[['kode', 'Prediction','SAW Score']])
 saw_df = saw_df.sort_values(by='Prediction', ascending=False)
 print(saw_df[['kode', 'Prediction','SAW Score']])
+
+
+import streamlit as st
+
+st.title('Stock Recommendation System')
+
+st.write('This is a simple stock recommendation system using AHP and SAW method, combined with Ensemble Learning')
+
+# show raw data
+st.write('Raw Data')
+st.dataframe(newData)
+
+# show data table
+st.write('Data 2019 Ranking Stock')
+rank = saw_df[['kode', 'SAW Score']].sort_values(by='SAW Score', ascending=False)
+# fix index
+rank.index = range(1,len(rank)+1)
+st.dataframe(rank)
+
+# show prediction table
+st.write('Prediction 2019 Ranking Stock')
+rankpred = saw_df[['kode', 'Prediction']].sort_values(by='Prediction', ascending=False)
+# fix index
+rankpred.index = range(1,len(rankpred)+1)
+st.dataframe(rankpred)
