@@ -173,8 +173,16 @@ st.title('Stock Recommendation System')
 st.write('This is a simple stock recommendation system using AHP and SAW method, combined with Ensemble Learning')
 
 # show raw data
+
+option = st.selectbox(
+    "Pilih Tahun DataSet?",
+    ("2019", "2020", "2021"))
+
+st.write("You selected:", option)
 st.write('Raw Data')
-st.dataframe(newData, use_container_width=True)
+
+selectedData = pd.read_csv(f'{option}.csv')[['kode','tahun', 'PBR', 'PER', 'ROE', 'DER', 'DPR']]
+st.dataframe(selectedData, use_container_width=True)
 
 # show data table
 st.write('Data 2019 Ranking Stock')
