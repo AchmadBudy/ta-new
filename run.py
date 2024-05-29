@@ -2,8 +2,6 @@
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_breast_cancer
 from sklearn.metrics import accuracy_score
-
-
 import ahpy
 
 comparisons = {
@@ -34,19 +32,9 @@ comparisons = {
     ('DPR', 'DPR'): 1
 }
 
+
 drinks = ahpy.Compare(name='Drinks', comparisons=comparisons, precision=3, random_index='saaty')
-
-# print(drinks.target_weights)
 weights = drinks.target_weights
-
-# # normalisasi bobot
-# total = sum(weights.values())
-# for key in weights:
-#     weights[key] = weights[key] / total
-
-# print(weights)
-
-# print(drinks.consistency_ratio)
 
 
 # PBR (Price to Book Value): Benefit
@@ -55,29 +43,14 @@ weights = drinks.target_weights
 # ROE (Return on Equity): Benefit
 # DPR (Dividend Payout Ratio): Benefit
 
-listBenefit = ['PBR', 'PER', 'ROE', 'DPR']
-
-def SAW(data, weights):
-    # Normalisasi matriks keputusan
-    normalized_data = data.copy()
-    for column in data.columns[1:]:  # Kolom pertama adalah kode alternatif
-        max_value = data[column].max()
-        normalized_data[column] = data[column] / max_value
-
-    # Hitung nilai total SAW untuk setiap alternatif
-    saw_values = {}
-    for index, row in normalized_data.iterrows():
-        alternatif = row['kode']
-        saw_values[alternatif] = sum(row[kriteria] * weight for kriteria, weight in zip(data.columns[1:], weights))
-
-    return saw_values
+# listBenefit = ['PBR', 'PER', 'ROE', 'DPR']
 
 # get data from csv
 import pandas as pd
 import numpy as np
 
 
-data = pd.read_csv('datanya.csv')
+data = pd.read_csv('2020.csv')
 newData = data.copy()[["kode","PBR","PER","ROE","DER","DPR"]]
 
 newData['PBR'] = newData['PBR'].astype(float)
@@ -103,23 +76,23 @@ def calculate_saw(df, weights):
     saw_scores = np.zeros(len(df))
     for column in df.columns[1:]:
         saw_scores += df[column] * weights[column]
-    df['SAW Score'] = saw_scores
+    df['Target'] = saw_scores
     return df
 
 # Data dengan nilai SAW
 saw_df = calculate_saw(normalized_df.copy(), weights)
 
 # Mengurutkan berdasarkan nilai SAW tertinggi
-saw_df = saw_df.sort_values(by='SAW Score', ascending=False)
+saw_df = saw_df.sort_values(by='Target', ascending=False)
 
 # Menampilkan hasil akhir
-# print(saw_df[['kode', 'SAW Score']])
+# print(saw_df[['kode', 'Target']])
 
-data = saw_df.drop(columns=['kode','SAW Score']).values
-target = saw_df['SAW Score'].values
+data = saw_df.drop(columns=['kode','Target']).values
+target = saw_df['Target'].values
 # print(data)
 # print(target)
-# X_train, X_test, y_train, y_test = train_test_split(saw_df.drop(columns=['kode','SAW Score']), saw_df['SAW Score'], test_size=0.2, random_state=42)
+# X_train, X_test, y_train, y_test = train_test_split(saw_df.drop(columns=['kode','Target']), saw_df['Target'], test_size=0.2, random_state=42)
 # cancer = load_breast_cancer()
 X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.2, random_state=42)
 
@@ -161,16 +134,14 @@ print(f"R-squared (R²): {r2:.4f}")
 
 # add prediction to dataframe
 saw_df['Prediction'] = stacking_model.predict(data)
-print(saw_df[['kode', 'Prediction','SAW Score']])
+print(saw_df[['kode', 'Prediction','Target']])
 saw_df = saw_df.sort_values(by='Prediction', ascending=False)
-print(saw_df[['kode', 'Prediction','SAW Score']])
+print(saw_df[['kode', 'Prediction','Target']])
 
 
 import streamlit as st
 
-st.title('Stock Recommendation System')
-
-st.write('This is a simple stock recommendation system using AHP and SAW method, combined with Ensemble Learning')
+st.title('Stock Classification System')
 
 # show raw data
 
@@ -185,14 +156,14 @@ selectedData = pd.read_csv(f'{option}.csv')[['kode','tahun', 'PBR', 'PER', 'ROE'
 st.dataframe(selectedData, use_container_width=True)
 
 # show data table
-st.write('Data 2019 Ranking Stock')
-rank = saw_df[['kode', 'SAW Score']].sort_values(by='SAW Score', ascending=False)
+st.write('Data set 2019 with Target Value')
+rank = saw_df[['kode', 'Target']].sort_values(by='Target', ascending=False)
 # fix index
 rank.index = range(1,len(rank)+1)
 st.dataframe(rank, use_container_width=True)
 
 # show prediction table
-st.write('Prediction 2019 Ranking Stock')
+st.write('classification based on 2020 data')
 rankpred = saw_df[['kode', 'Prediction']].sort_values(by='Prediction', ascending=False)
 # fix index
 rankpred.index = range(1,len(rankpred)+1)
