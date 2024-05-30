@@ -36,16 +36,6 @@ stacking_model.fit(X_train, y_train)
 y_pred = stacking_model.predict(X_test)
 
 
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-# Evaluasi kinerja model
-mae = mean_absolute_error(y_test, y_pred)
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
-
-# Cetak hasil evaluasi
-print(f"Mean Absolute Error (MAE): {mae:.4f}")
-print(f"Mean Squared Error (MSE): {mse:.4f}")
-print(f"R-squared (R²): {r2:.4f}")
 
 data2021 = pd.read_csv('2021.csv')[["kode","PBR","PER","ROE","DER","DPR"]]
 data2021WithoutKode = data2021[["PBR","PER","ROE","DER","DPR"]].values
@@ -80,3 +70,35 @@ rankpred = data2021[['kode', 'Prediction']].sort_values(by='Prediction', ascendi
 # fix index
 rankpred.index = range(1,len(rankpred)+1)
 st.dataframe(rankpred, use_container_width=True)
+
+from sklearn.metrics import classification_report
+# uji akurasi
+# st.write('Accuracy Ensemble Model')
+print('Accuracy Ensemble Model')
+print(classification_report(y_test, y_pred))
+
+# print(y_train)
+# test random forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+y_pred_rf = rf.predict(X_test)
+print('Accuracy Random Forest')
+print(classification_report(y_test, y_pred_rf))
+
+# test xgboost
+xgb = XGBClassifier(n_estimators=100, random_state=42)
+y_train_adjusted = y_train - 1
+y_test_adjusted = y_test - 1
+xgb.fit(X_train, y_train_adjusted)
+y_pred_xgb = xgb.predict(X_test)
+print('Accuracy XGBoost')
+print(classification_report(y_test_adjusted, y_pred_xgb))
+
+# test svc
+svc = SVC()
+svc.fit(X_train, y_train)
+y_pred_svc = svc.predict(X_test)
+print('Accuracy SVC')
+print(classification_report(y_test, y_pred_svc))
+
+print(y_test_adjusted)
